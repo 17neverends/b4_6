@@ -274,7 +274,7 @@
                 </div>
                 </div>
             </div>
-            <button class="addNumberButton" type="button" id="add" onclick="addNumberPhone('sender')" >+ Добавить номер</button>
+            <button class="created" type="button" id="add" onclick="addNumberPhone('sender')" >+ Добавить номер</button>
             <div class="additionalSenderInputs">
 
             </div>
@@ -305,7 +305,7 @@
 
             <div class="nds-flex">
                 <div class="droprow">
-                    <input type="text" id="combobox_value_page5" onclick="showDropdown('ndsList')" placeholder="НДС" readonly>
+                    <input type="text" id="combobox_value_page5" onclick="showDropdownPage5('ndsList')" placeholder="НДС" readonly>
                     <ul id="ndsList" class="dropdown-list">
                         <li value="without" data-id="without" class="option" onclick="selectNDS('without', 'Нет НДС','combobox_value_page5', 'ndsList', 'amount', 'calculation')">Нет НДС</li>
                         <li value="zero" data-id="zero" class="option" onclick="selectNDS('zero', '0%','combobox_value_page5', 'ndsList', 'amount', 'calculation')">0%</li>

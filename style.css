@@ -669,14 +669,7 @@ ul {
 
 
 
-  .place_title {
-    display: flex;
-    border-bottom: 2px solid #4bba5d;
-    justify-content: center;
-    margin-bottom: 30px;
-    margin-top: 40px;
-    font-size: 20px;
-}
+
 
 #add {
     margin-bottom: 50px;
@@ -803,11 +796,7 @@ ul {
     display: none;
 }
 
-.items{
-    border-top: 2px solid #4bba5d;
-    padding-top: 20px;
-    font-size: 17px;
-}
+
 
 .dropdown-list_page5 {
     display: none;
@@ -933,3 +922,10 @@ h4 {
     display: flex;
     text-align: left;
 }
+
+h3 {
+    font-size: 19px;
+    margin-bottom: 30px;
+    text-align: center;
+    margin-top: 40px;
+}   

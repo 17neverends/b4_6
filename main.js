@@ -40,6 +40,8 @@ class Result {
   }
 }
 
+
+
 const status_text = document.getElementById('status1');
 let page1 = document.querySelector('.step1');
 let page2 = document.querySelector('.step2');
@@ -257,18 +259,17 @@ document.addEventListener('click', function(event) {
 
 
 function check_inputs_step1() {
-
+  
   const places = document.getElementsByClassName('place');
   let isValid = true;
   const placesData = [];
 
-  for (let i = 0; i < places.length; i++) {
-    const currentPlace = places[i];
-    const boxWeight = currentPlace.querySelector(`#box_weight${i + 1}`);
-    const boxLength = currentPlace.querySelector(`#box_length${i + 1}`);
-    const boxWidth = currentPlace.querySelector(`#box_width${i + 1}`);
-    const boxHeight = currentPlace.querySelector(`#box_height${i + 1}`);
-
+  for (let id = 0; id < places.length; id++) {
+    const currentPlace = places[id];
+    const boxWeight = currentPlace.querySelector(`#box_weight${id + 1}`);
+    const boxLength = currentPlace.querySelector(`#box_length${id + 1}`);
+    const boxWidth = currentPlace.querySelector(`#box_width${id + 1}`);
+    const boxHeight = currentPlace.querySelector(`#box_height${id + 1}`);
     removeErrorStyle(boxWeight);
     removeErrorStyle(boxLength);
     removeErrorStyle(boxWidth);
@@ -354,7 +355,6 @@ function check_inputs_step1() {
         "width": packageData.width,
       });
     });
-    console.log(data);
     formData.append('data', JSON.stringify(data));
     fetch('/get_data', {
       method: 'POST',
@@ -379,7 +379,6 @@ function check_inputs_step1() {
 
   })
   } else{ 
-    console.log(weight);
     selectedType = 'Не выбран';
     boxData = {
       "Коробка XS": {
@@ -414,7 +413,6 @@ function check_inputs_step1() {
     var manualRadio = document.getElementById("manual");
     manualRadio.checked = true;
     document.getElementById('status2').innerText = '';
-    
     sliderShowPoint(3);
     cost_6.style.display = 'block';
 
@@ -611,8 +609,6 @@ function scrollToTop() {
 }
 
 
-// window.TelegramWebviewProxy.postEvent('web_app_setup_closing_behavior', JSON.stringify({ need_confirmation: true }));
-///////////////////////////
 
 const detailsContainer = document.getElementById("detailsContainer");
 const statusParagraph = document.getElementById("status2");
@@ -752,6 +748,7 @@ function sliderShowPoint(point){
     page3.style.display = 'none';
     page4.style.display = 'none';
     page5.style.display = 'none';
+    page6.style.display = 'none';
 
     sliderpoint2.style.display = 'none';
     sliderpoint3.style.display = 'none';
@@ -769,6 +766,7 @@ function sliderShowPoint(point){
     page3.style.display = 'none';
     page4.style.display = 'none';
     page5.style.display = 'none';
+    page6.style.display = 'none';
 
     sliderpoint3.style.display = 'none';
     sliderpoint4.style.display = 'none';
@@ -784,6 +782,7 @@ function sliderShowPoint(point){
     page3.style.display = 'block';
     page4.style.display = 'none';
     page5.style.display = 'none';
+    page6.style.display = 'none';
 
     sliderpoint3.style.display = 'block';
     sliderpoint4.style.display = 'none';
@@ -813,6 +812,7 @@ function sliderShowPoint(point){
     page3.style.display = 'none';
     page4.style.display = 'block';
     page5.style.display = 'none';
+    page6.style.display = 'none';
 
 
     sliderpoint4.style.display = 'block';
@@ -834,6 +834,8 @@ function sliderShowPoint(point){
     page3.style.display = 'none';
     page4.style.display = 'none';
     page5.style.display = 'block';
+    page6.style.display = 'none';
+
     sliderpoint5.style.display = 'block';
     sliderpoint6.style.display = 'none';
 
@@ -870,7 +872,6 @@ document.getElementById("confirm2").addEventListener("click", function () {
   if (!selectedType) {
     selectedType = 'Не выбран';
   } 
-      console.log(selectedType);
       document.getElementById('totalcost').style.display = 'block';
       boxData = {
         "Коробка XS": {
@@ -1046,7 +1047,6 @@ function updateCost() {
   const floorLift = document.getElementById('floorLift');
   let status = document.getElementById('status_for_info');
   weight = data.packages[0].weight;
-  console.log(weight);
   if (checkboxService6.checked) {
       if (weight <= 150) {
           acsentToTheFloor.style.display = 'block';
@@ -1319,14 +1319,13 @@ function updateBoxCount(boxName, newValue) {
 
 
 
-
+let prr = 0;
 
 function calculateInitialCost() {
   let totalcost = 0;
   let packageType = data.packages[0].type.toLowerCase();
   let weight = data.packages[0].weight;
-  console.log(packageType);
-  console.log(weight);
+
   document.getElementById('totalcost').innerText = `Стоимость доставки: ${selectedCost}`;
   let doorLocation = '';
   let status = document.getElementById('floor_status');
@@ -1338,7 +1337,6 @@ function calculateInitialCost() {
       
   } 
   const packageParts = packageType.split("-").map(part => part.trim().toLowerCase());
-  console.log(packageParts);
   if (packageParts.includes('дверь')) {
       if (packageParts[0].includes("дверь") && packageParts[1].includes("дверь")) {
           doorLocation = 'отправителя и получателя';
@@ -1350,7 +1348,7 @@ function calculateInitialCost() {
   }
   
   let cost = 0;
-  let prr = 0;
+  prr = 0;
   if (packageType.includes('дверь')) {
       let mult = 1;
       if (doorLocation === 'отправителя и получателя') {
@@ -1371,7 +1369,6 @@ function calculateInitialCost() {
           prr += 1500 * mult;
       }
   }
-  console.log(doorLocation);
   totalcost += cost;
   if (doorLocation) {
       status.style.display = 'block';
@@ -1431,7 +1428,7 @@ function addNumberPhone(role) {
       <input type="text" class="${role}_addit" id="${role}_addit${placeCounter}" name="${role}_addit${placeCounter}" placeholder="Введите номер">
     </div>
   </div>
-  <button class="addNumberButton" id="for_delete" type="button" onclick="removeNumberPhone('${role}', '${role}_numbers${placeCounter}')">Удалить</button>`;
+  <button class="created" id="for_delete" type="button" onclick="removeNumberPhone('${role}', '${role}_numbers${placeCounter}')">Удалить</button>`;
   document.getElementById(`${role}_numbers-container`).appendChild(newPlace);
 }
 
@@ -1532,7 +1529,7 @@ function check_inputs_page4() {
 
 
   if (isValid) {
-    for (let i = 1; i <= placeCounter - 1;i++){
+    for (let i = 1; i < placeCounter;i++){
       HashMap[i] = 1;
     }
     sliderShowPoint(5);
@@ -1661,7 +1658,6 @@ function handleInputPvz(inputElement, list, input_value, otherList) {
           return;
       }
       const filtered_cities = result.data;
-      console.log(filtered_cities);
 
       dropdownListPvz(list, filtered_cities, [], trimmedInputValue, inputElement, otherList);
   }, 300);
@@ -1754,7 +1750,8 @@ function submit_info() {
   let additRecepient = document.querySelector(".additionalRecepientInputs")
   let additSender = document.querySelector(".additionalSenderInputs")
   needCheckPvz = false;
-
+  result.logInfo();
+  console.log(globalResult);
   sliderShowPoint(4);
 
   if (selectedType.toLowerCase() === 'не выбран') {
@@ -1830,7 +1827,7 @@ let comboBox = document.getElementById('combobox_value_page5');
 
 
 
-function showDropdown(inputID) {
+function showDropdownPage5(inputID) {
   var dropdown = document.getElementById(inputID);
   if (dropdown) {
     dropdown.style.display = "block";
@@ -2003,7 +2000,7 @@ function showPlacesOnload() {
               <div class="nds-flex">
                   <div class="left_input_place" id="left_input_place${i+1}_${current}">
                       <label>Ставка НДС, %</label>
-                      <input type="text" class="place_combobox_value" id="place_combobox_value${i+1}_${current}" onclick="showDropdown('place_ndsList${i+1}_${current}')" placeholder="НДС" readonly>
+                      <input type="text" class="place_combobox_value" id="place_combobox_value${i+1}_${current}" onclick="showDropdownPage5('place_ndsList${i+1}_${current}')" placeholder="НДС" readonly>
                       <ul id="place_ndsList${i+1}_${current}" class="dropdown-list">
                           <li value="without" data-id="without" class="option" onclick="selectNDS('without', 'Нет НДС','place_combobox_value${i+1}_${current}', 'place_ndsList${i+1}_${current}','cost${i+1}_${current}','nds_cost${i+1}_${current}')">Нет НДС</li>
                           <li value="zero" data-id="zero" class="option" onclick="selectNDS('zero', '0%','place_combobox_value${i+1}_${current}', 'place_ndsList${i+1}_${current}','cost${i+1}_${current}','nds_cost${i+1}_${current}')">0%</li>
@@ -2061,7 +2058,7 @@ function addNumberPage5(id) {
       <div class="nds-flex">
           <div class="left_input_place" id="left_input_place${id}_${counter}">
               <label>Ставка НДС, %</label>
-              <input type="text" class="place_combobox_value" id="place_combobox_value${id}_${counter}" onclick="showDropdown('place_ndsList${id}_${counter}')" placeholder="НДС" readonly>
+              <input type="text" class="place_combobox_value" id="place_combobox_value${id}_${counter}" onclick="showDropdownPage5('place_ndsList${id}_${counter}')" placeholder="НДС" readonly>
               <ul id="place_ndsList${id}_${counter}" class="dropdown-list">
                   <li value="without" data-id="without" class="option" onclick="selectNDS('without', 'Нет НДС','place_combobox_value${id}_${counter}', 'place_ndsList${id}_${counter}', 'cost${id}_${counter}', 'nds_cost${id}_${counter}')">Нет НДС</li>
                   <li value="zero" data-id="zero" class="option" onclick="selectNDS('zero', '0%','place_combobox_value${id}_${counter}', 'place_ndsList${id}_${counter}', 'cost${id}_${counter}', 'nds_cost${id}_${counter}')">0%</li>
@@ -2146,7 +2143,7 @@ function removePlacePage5(placeId) {
       const inputInsideLeftInputPlace = leftInputPlace.querySelector('input');
       if (inputInsideLeftInputPlace) {
         inputInsideLeftInputPlace.id = `place_combobox_value${parentIdNum}_${newCounter}`;
-        inputInsideLeftInputPlace.setAttribute('onclick', `showDropdown('place_ndsList${parentIdNum}_${newCounter}')`);
+        inputInsideLeftInputPlace.setAttribute('onclick', `showDropdownPage5('place_ndsList${parentIdNum}_${newCounter}')`);
       }
       const dropdownList = leftInputPlace.querySelector('.dropdown-list');
       if (dropdownList) {
@@ -2181,8 +2178,355 @@ document.getElementById('amount').addEventListener('input', function() {
 });
 
 
+function extractNumbers(role) {
+  var numbersArray = [];
+  var additArray = [];
+
+  var container = document.getElementById(`${role}_numbers-container`);
+
+  if (container) {
+      var recipientNumbers = container.querySelectorAll(`.${role}_numbers`);
+
+      recipientNumbers.forEach(function(element) {
+          var mobileInput = element.querySelector(`.recipient_mobile`);
+          var additInput = element.querySelector(`.recipient_addit`);
+
+          if (mobileInput && additInput) {
+              var mobileValue = mobileInput.value.trim();
+              numbersArray.push(mobileValue);
+
+              var additValue = additInput.value.trim();
+              additArray.push(additValue);
+          }
+      });
+  }
+
+  return [numbersArray, additArray];
+}
+
+
+
+
+
+
+let finalResult;
+let labels;
+let parametrsDiv = document.querySelector('.parametrs-details');
+let additionalDiv = document.querySelector('.additional');
+let totalCostElement = document.querySelector('.totalcost');
+let deliveryDateElement = document.querySelector('.delivery_date');
+
+
 function go_to_page6(){
+
+  var [numbersSender, additsSender] = extractNumbers('sender');
+  var [numbersRecepient, additsRecepient] = extractNumbers('recepient');
+
+  let boxes_result = { "Коробка": { cost: [], desc: [] } };
+  Object.values(globalResult.field7).forEach(box => {
+    boxes_result["Коробка"].cost.push(box.стоимость + "₽");
+    boxes_result["Коробка"].desc.push(`Вес до ${box.вес}кг (${box.размер}) ${box.кол_во}шт`);
+  });
+
+
+   finalResult = {
+    "parametrs": {
+        "Размер посылки": data.packages[0].length && data.packages[0].width && data.packages[0].height ? `${data.packages[0].length}x${data.packages[0].width}x${data.packages[0].height} см` : '',
+        "Физический вес посылки": data.packages[0].weight ? data.packages[0].weight : '',
+        "Расчётный вес посылки": "20кг",
+        "Город отправителя": `${document.getElementById('departure_city').value}`,
+        "Город получателя": `${document.getElementById('destination_city').value}`,
+        "Тип доставки": `${selectedType}`
+    },
+    "additional": {
+        "Примерка на дому": {
+            "cost": result.field1 ? '0₽' : '',
+            "desc": result.field1 ? 'да' : ''
+        },
+
+          "Уведомление о создании заказа в СДЭК": {
+            "cost": result.field2 ? "10₽" : '',
+            "desc": result.field2 ? 'да' : ''
+        },
+
+          "Скан документов": {
+            "cost": result.field3 ? "50₽" : '',
+            "desc": result.field3 ? 'да' : ''
+        },
+
+          "Частичная доставка": {
+            "cost": result.field4 ? "0₽" : '',
+            "desc": result.field4 ? 'да' : ''
+        },
+        "Воздушно-пузырчатая плёнка": {
+            "cost": result.field5 ? result.field5[0] : '',
+            "desc": result.field5 ? result.field5[1] : ''
+        },
+        "Подъем на этаж":{
+          "cost": result.field6 ? result.field6[0] : '',
+          "desc": result.field6 ? result.field6[1] : ''
+        },
+        "Погрузка-разгрузочные работы":{
+            "cost": star ? prr : '',
+            "desc": ''
+        },
+        "Коробка": {
+            "cost": boxes_result["Коробка"].cost,
+            "desc": boxes_result["Коробка"].desc
+        }
+    },
+    "sender": {
+        "name" : `${document.getElementById('sender_company').value}`,
+        "contact": `${document.getElementById('sender_fullname').value}`,
+        "number": numbersSender,
+        "address": additsSender
+    },
+
+    "recepient": {
+        "name" : `${document.getElementById('recipient_company').value}`,
+        "contact": `${document.getElementById('recipient_fullname').value}`,
+        "number": numbersRecepient,
+        "address": additsRecepient
+    },
+
+    "collecting": {
+        "delivery_cost" : "100 ₽",
+        "nds_cost_common": "20 ₽",
+        "total_cost": "120 ₽",
+        "places": {
+            "place_1":
+                        {
+                            "item_1": {
+                                "code": "12121",
+                                "name_item": "Место 1 Товар 1",
+                                "cost": "10000 ₽",
+                                "weight": "10 кг.",
+                                "count": "3 шт.",
+                                "amount": "30000 ₽",
+                                "nds_count": "200 ₽",
+                                "nds_cost": "30200 ₽"
+                            },
+                            "item_2": {
+                                "code": "12121",
+                                "name_item": "Место 1 Товар 1",
+                                "cost": "10000 ₽",
+                                "weight": "10 кг.",
+                                "count": "3 шт.",
+                                "amount": "30000 ₽",
+                                "nds_count": "200 ₽",
+                                "nds_cost": "30200 ₽"
+                            },
+                            "item_3": {
+                                "code": "12121",
+                                "name_item": "Место 1 Товар 1",
+                                "cost": "10000 ₽",
+                                "weight": "10 кг.",
+                                "count": "3 шт.",
+                                "amount": "30000 ₽",
+                                "nds_count": "200 ₽",
+                                "nds_cost": "30200 ₽"
+                            }
+                        },
+            
+        }
+    },
+    "info": {
+        "Стоимость": "100.00 ₽",
+        "Срок доставки":"1-2 дня"
+    }
+};
+
+labels = {
+  "name": "ФИО/Компания:",
+  "contact": "Контактное лицо:",
+  "number": "Номер:",
+  "address": "Адрес:",
+  "date": "Дата:",
+  "time": "Время:",
+  "break": "Перерыв:",
+  "code": "Код артикула:",
+  "cost": "Стоимость ед. товара:",
+  "weight": "Вес ед. товара:",
+  "count": "Кол-во ед.:",
+  "amount": "Оплата получателя за ед. товара:",
+  "nds_count": "Ставка НДС:",
+  "nds_cost": "Сумма НДС:",
+  "name_item": "Наименование:",
+  "delivery_cost":"Доп. сбор за доставку с получателя, в т.ч. НДС:",
+  "nds_cost_common":"Ставка НДС за доп. сбор с получателя:",
+  "total_cost":"Сумма за доп. сбор с получателя:"
+
+};
+  totalCostElement.textContent = `Стоимость: ${finalResult.info.Стоимость}`;
+  deliveryDateElement.textContent = `Срок доставки: ${finalResult.info['Срок доставки']}`;
+  for (let key in finalResult.parametrs) {
+    let div = document.createElement('div');
+    div.classList.add('rowitems');
+
+    let keyElement = document.createElement('p');
+    keyElement.classList.add('key');
+    keyElement.textContent = `${key}`;
+
+    let valueElement = document.createElement('p');
+    valueElement.classList.add('value');
+    valueElement.textContent = finalResult.parametrs[key];
+
+    div.appendChild(keyElement);
+    div.appendChild(valueElement);
+
+    parametrsDiv.appendChild(div);
+}
+
+for (let key in finalResult.additional) {
+    let div = document.createElement('div');
+    div.classList.add('additional-item');
+
+    let keyElement = document.createElement('p');
+    keyElement.classList.add('key');
+    keyElement.textContent = `${key}:`;
+
+    let valueElement = document.createElement('div');
+    valueElement.classList.add('value');
+
+    if (typeof finalResult.additional[key] === 'object') {
+        if (Array.isArray(finalResult.additional[key].cost)) {
+            for (let i = 0; i < finalResult.additional[key].cost.length; i++) {
+                let itemDiv = document.createElement('div');
+                itemDiv.classList.add('sub-item');
+    
+                let costElement = document.createElement('p');
+                costElement.textContent = finalResult.additional[key].cost[i];
+                costElement.classList.add('cost-element');
+    
+                let descElement = document.createElement('p');
+                descElement.textContent = finalResult.additional[key].desc[i];
+                descElement.classList.add('desc-element');
+    
+                itemDiv.appendChild(costElement);
+                itemDiv.appendChild(descElement);
+    
+                valueElement.appendChild(itemDiv);
+            }
+        } else {
+            let divElse = document.createElement('div'); 
+            divElse.classList.add('sub1-item');
+    
+            let costElement = document.createElement('p');
+            costElement.textContent = finalResult.additional[key].cost;
+            costElement.classList.add('cost-element');
+            divElse.appendChild(costElement);
+    
+            let descElement = document.createElement('p');
+            descElement.textContent = finalResult.additional[key].desc;
+            descElement.classList.add('desc-element');
+            divElse.appendChild(descElement);
+    
+            valueElement.appendChild(divElse); 
+        }
+    } else {
+        let element = document.createElement('p');
+        element.textContent = `${finalResult.additional[key]}`;
+        element.classList.add('non-object-value');
+        valueElement.appendChild(element);
+    }
+
+    div.appendChild(keyElement);
+    div.appendChild(valueElement);
+
+    additionalDiv.appendChild(div);
+}
+  createKeyValueDiv();
+  push_to_page('sender-details', 'sender');
+  push_to_page('recepient-details', 'recepient');
+
   sliderShowPoint(6)
 }
 
 
+
+
+function push_to_page(divname, get_from) {
+  let div_to_push = document.querySelector(`.${divname}`);
+
+  for (let key in finalResult[`${get_from}`]) {
+      let div = document.createElement('div');
+      div.classList.add('rowitems');
+  
+      let keyElement = document.createElement('p');
+      keyElement.classList.add('key');
+      keyElement.textContent = labels[key] || key;
+  
+      let valueElement = document.createElement('p');
+      valueElement.classList.add('value');
+      valueElement.textContent = finalResult[`${get_from}`][key];
+  
+      div.appendChild(keyElement);
+      div.appendChild(valueElement);
+  
+      div_to_push.appendChild(div);
+  }
+}
+
+
+function createKeyValueDiv() {
+  let container = document.querySelector('.collecting-details');
+
+  for (let key in finalResult.collecting) {
+      if (key !== 'places') {
+          let div = document.createElement('div');
+          div.classList.add('rowitems');
+
+          let keyElement = document.createElement('p');
+          keyElement.classList.add('key');
+          keyElement.textContent = labels[key] || key;
+
+          let valueElement = document.createElement('p');
+          valueElement.classList.add('value');
+          valueElement.textContent = finalResult.collecting[key]; 
+
+          div.appendChild(keyElement);
+          div.appendChild(valueElement);
+
+          container.appendChild(div);
+      }
+  }
+
+  for (let placeNum in finalResult.collecting.places) {
+      let placeDiv = document.createElement('div');
+      placeDiv.className = 'resultPlace';
+      
+      let placeHeader = document.createElement('h3');
+      placeHeader.textContent = "Место " + placeNum.slice(-1);
+      placeDiv.appendChild(placeHeader);
+
+      let placefinalResult = finalResult.collecting.places[placeNum];
+      for (let itemNum in placefinalResult) {
+          let itemDiv = document.createElement('div');
+          itemDiv.className = 'items';
+
+          let itemHeader = document.createElement('h4');
+          itemHeader.textContent = "Товар " + placeNum.slice(-1) + "." + itemNum.slice(-1);
+          itemDiv.appendChild(itemHeader);
+
+          let itemfinalResult = placefinalResult[itemNum];
+          for (let itemInfoKey in itemfinalResult) {
+              let row = document.createElement('div');
+              row.className = 'rowitems';
+
+              let keyElement = document.createElement('p');
+              keyElement.className = 'key';
+              keyElement.textContent = labels[itemInfoKey];
+
+              let valueElement = document.createElement('p');
+              valueElement.className = 'value';
+              valueElement.textContent = itemfinalResult[itemInfoKey];
+
+              row.appendChild(keyElement);
+              row.appendChild(valueElement);
+              itemDiv.appendChild(row);
+          }
+          placeDiv.appendChild(itemDiv);
+      }
+      container.appendChild(placeDiv);
+  }
+}
