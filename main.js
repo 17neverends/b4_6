@@ -10,6 +10,9 @@ async function init() {
   setupEventListeners();
 }
 
+let senderAdress;
+let recepientAdress;
+
 class Result {
   constructor(
   field1 = false,
@@ -362,7 +365,7 @@ function check_inputs_step1() {
   }).then(() => {
     let responseData = {
       "details": [
-          { "type": "дверь - дверь", "cost": "100₽", "datetime": "1-3 раб.д" },
+          { "type": "Дверь - дверь", "cost": "100₽", "datetime": "1-3 раб.д" },
           { "type": "Дверь - склад", "cost": "2000₽", "datetime": "2-3 раб.д" },
           { "type": "Склад - дверь", "cost": "3000₽", "datetime": "3-4 раб.д" },
           { "type": "Склад - склад", "cost": "400₽", "datetime": "1-2 раб.д" }
@@ -460,25 +463,27 @@ function gatherFormData() {
 
   let i = 1;
 
-while (true) {
-    let placeId = `place${i}`;
-    let placeElement = document.getElementById(placeId);
+  while (true) {
+      let placeId = `place${i}`;
+      let placeElement = document.getElementById(placeId);
 
-    if (!placeElement) {
-        break;
-    }
+      if (!placeElement) {
+          break;
+      }
 
-    let placeData = {
-        [`box_weight${i}`]: document.getElementById(`box_weight${i}`).value,
-        [`box_length${i}`]: document.getElementById(`box_length${i}`).value,
-        [`box_width${i}`]: document.getElementById(`box_width${i}`).value,
-        [`box_height${i}`]: document.getElementById(`box_height${i}`).value,
-        [`desc${i}`]: document.getElementById(`desc${i}`).value
-    };
+      let placeData = {
+          [`box_weight${i}`]: document.getElementById(`box_weight${i}`).value,
+          [`box_length${i}`]: document.getElementById(`box_length${i}`).value,
+          [`box_width${i}`]: document.getElementById(`box_width${i}`).value,
+          [`box_height${i}`]: document.getElementById(`box_height${i}`).value,
+          [`desc${i}`]: document.getElementById(`desc${i}`).value
+      };
 
-    formData.places.push(placeData);
-    i++;
-}
+      formData.places.push(placeData);
+      console.log(i);
+
+      i++;
+  }
 
   return formData;
 }
@@ -614,6 +619,7 @@ const detailsContainer = document.getElementById("detailsContainer");
 const statusParagraph = document.getElementById("status2");
 let selectedType;
 let selectedCost;
+let selectedTime;
 let selectedDetail = null;
 
 function createDetailItem(detail) {
@@ -631,10 +637,11 @@ function createDetailItem(detail) {
     createAndAppend("p", detail.datetime);
 
     itemDiv.addEventListener("click", function () {
-        if (selectedType === detail.type && selectedCost === detail.cost) {
+        if (selectedType === detail.type && selectedCost === detail.cost && selectedTime === detail.datetime) {
             itemDiv.classList.remove("selected");
             selectedType = null;
             selectedCost = null;
+            selectedTime = null;
             selectedDetail = null;
         } else {
             if (selectedDetail) {
@@ -643,6 +650,7 @@ function createDetailItem(detail) {
             itemDiv.classList.add("selected");
             selectedType = detail.type;
             selectedCost = detail.cost;
+            selectedTime = detail.datetime;
             selectedDetail = itemDiv;
         }
     });
@@ -708,7 +716,7 @@ function showDetailsOnPage() {
 
   details.forEach(detail => {
     const itemDiv = createDetailItem(detail);
-    if (detail.type === selectedType && detail.cost === selectedCost) {
+    if (detail.type === selectedType && detail.cost === selectedCost && selectedTime === detail.datetime) {
       itemDiv.classList.add("selected");
       selectedDetail = itemDiv;
     }
@@ -1532,6 +1540,34 @@ function check_inputs_page4() {
     for (let i = 1; i < placeCounter;i++){
       HashMap[i] = 1;
     }
+
+    if (selectedType.toLowerCase() === 'дверь - дверь') {
+
+      senderAdress = `${document.getElementById('sender_address').value}, ${document.getElementById('sender_house').value}, ${document.getElementById('sender_flat').value} `;
+
+      recepientAdress = `${document.getElementById('recipient_address').value}, ${document.getElementById('recipient_house').value}, ${document.getElementById('recipient_flat').value} `;
+  
+    } else if (selectedType.toLowerCase() === 'дверь - склад') {
+
+      recepientAdress = `${document.getElementById('recipient_address').value}, ${document.getElementById('recipient_house').value}, ${document.getElementById('recipient_flat').value} `;
+
+  
+      senderPoint = document.getElementById('sender_point');
+      senderAdress = `${senderPoint.value}`;
+
+  
+    } else if (selectedType.toLowerCase() === 'склад - дверь') {
+
+      senderAdress = `${document.getElementById('sender_address').value}, ${document.getElementById('sender_house').value}, ${document.getElementById('sender_flat').value} `;
+
+      
+    } else if (selectedType.toLowerCase() === 'склад - склад') {
+      
+  
+      senderPoint = document.getElementById('sender_point');
+      recepientAdress = `${senderPoint.value}`;
+  
+    }
     sliderShowPoint(5);
     showPlacesOnload();
   } else {
@@ -1724,7 +1760,7 @@ function dropdownListPvz(list, filtered_cities, filtered_regions, input_value, i
 
 let senderPoint;
 let senderPointList;
-
+let lastTarif;
 
 function handleInputPvzChange(inputElement, list, otherList) {
   const trimmedInputValue = inputElement.value.trim();
@@ -1745,83 +1781,88 @@ function setupEventListenersPvz() {
 
 
 
+let previousSelectedType = '';
+
 function submit_info() {
   status4.innerText = '';
   let additRecepient = document.querySelector(".additionalRecepientInputs")
   let additSender = document.querySelector(".additionalSenderInputs")
   needCheckPvz = false;
-  result.logInfo();
-  console.log(globalResult);
   sliderShowPoint(4);
-
-  if (selectedType.toLowerCase() === 'не выбран') {
-
-  } else if (selectedType.toLowerCase() === 'дверь - дверь'){
-    additSender.innerHTML = `<label>Адрес</label>
-    <input type="text" id="sender_address" name="sender_address" placeholder="Введите адрес">
-    <label>Дом</label>
-    <input type="text" id="sender_house" name="sender_house" placeholder="Введите дом">
-    <label>Квартира</label>
-    <input type="text" id="sender_flat" name="sender_flat" placeholder="Введите квартиру">`;
-
-    additRecepient.innerHTML = `<label>Адрес</label>
-    <input type="text" id="recipient_address" name="recipient_address" placeholder="Введите адрес">
-    <label>Дом</label>
-    <input type="text" id="recipient_house" name="recipient_house" placeholder="Введите дом">
-    <label>Квартира</label>
-    <input type="text" id="recipient_flat" name="recipient_flat" placeholder="Введите квартиру">`;
-
-  } else if (selectedType.toLowerCase() === 'дверь - склад'){
-
-    additRecepient.innerHTML = `<label>Адрес</label>
-    <input type="text" id="recipient_address" name="recipient_address" placeholder="Введите адрес">
-    <label>Дом</label>
-    <input type="text" id="recipient_house" name="recipient_house" placeholder="Введите дом">
-    <label>Квартира</label>
-    <input type="text" id="recipient_flat" name="recipient_flat" placeholder="Введите квартиру">`;
-
-    additSender.innerHTML = `<label>Адрес пункта выдачи заказа</label>
-    <div class="destination_points_dropdown">
-
-    <input type="text" id="sender_point" name="sender_point" placeholder="Введите адрес ПВЗ">
-    <ul id="sender_point-list" data-cities="{{ data }}"></ul>`;
-
-    senderPoint = document.getElementById('sender_point');
-    senderPointList = document.getElementById('sender_point-list');
-    setupEventListenersPvz();
-
-
   
-  } else if (selectedType.toLowerCase() === 'склад - дверь'){
-    additSender.innerHTML = `<label>Адрес</label>
-    <input type="text" id="sender_address" name="sender_address" placeholder="Введите адрес">
-    <label>Дом</label>
-    <input type="text" id="sender_house" name="sender_house" placeholder="Введите дом">
-    <label>Квартира</label>
-    <input type="text" id="sender_flat" name="sender_flat" placeholder="Введите квартиру">`;
 
-    additRecepient.innerHTML = ``;
+  if (selectedType !== previousSelectedType) {
+    previousSelectedType = selectedType;
     
+    if (selectedType.toLowerCase() === 'дверь - дверь') {
+      additSender.innerHTML = `<label>Адрес</label>
+      <input type="text" id="sender_address" name="sender_address" placeholder="Введите адрес">
+      <label>Дом</label>
+      <input type="text" id="sender_house" name="sender_house" placeholder="Введите дом">
+      <label>Квартира</label>
+      <input type="text" id="sender_flat" name="sender_flat" placeholder="Введите квартиру">`;
+      senderAdress = `${document.getElementById('sender_address').value}, ${document.getElementById('sender_house').value}, ${document.getElementById('sender_flat').value} `;
   
-  } else if (selectedType.toLowerCase() === 'склад - склад'){
-    additRecepient.innerHTML = ``;
-
-    additSender.innerHTML = `<label>Адрес пункта выдачи заказа</label>
-    <div class="destination_points_dropdown">
-
-    <input type="text" id="sender_point" name="sender_point" placeholder="Введите адрес ПВЗ">
-    <ul id="sender_point-list" data-cities="{{ data }}"></ul>`;
-
-    senderPoint = document.getElementById('sender_point');
-    senderPointList = document.getElementById('sender_point-list');
-    setupEventListenersPvz();
-
+      additRecepient.innerHTML = `<label>Адрес</label>
+      <input type="text" id="recipient_address" name="recipient_address" placeholder="Введите адрес">
+      <label>Дом</label>
+      <input type="text" id="recipient_house" name="recipient_house" placeholder="Введите дом">
+      <label>Квартира</label>
+      <input type="text" id="recipient_flat" name="recipient_flat" placeholder="Введите квартиру">`;
+      recepientAdress = `${document.getElementById('recipient_address').value}, ${document.getElementById('recipient_house').value}, ${document.getElementById('recipient_flat').value} `;
+  
+    } else if (selectedType.toLowerCase() === 'дверь - склад') {
+      additRecepient.innerHTML = `<label>Адрес</label>
+      <input type="text" id="recipient_address" name="recipient_address" placeholder="Введите адрес">
+      <label>Дом</label>
+      <input type="text" id="recipient_house" name="recipient_house" placeholder="Введите дом">
+      <label>Квартира</label>
+      <input type="text" id="recipient_flat" name="recipient_flat" placeholder="Введите квартиру">`;
+      recepientAdress = `${document.getElementById('recipient_address').value}, ${document.getElementById('recipient_house').value}, ${document.getElementById('recipient_flat').value} `;
+  
+      additSender.innerHTML = `<label>Адрес пункта выдачи заказа</label>
+      <div class="destination_points_dropdown">
+  
+      <input type="text" id="sender_point" name="sender_point" placeholder="Введите адрес ПВЗ">
+      <ul id="sender_point-list" data-cities="{{ data }}"></ul>`;
+  
+      senderPoint = document.getElementById('sender_point');
+      senderPointList = document.getElementById('sender_point-list');
+      senderAdress = `${senderPoint.value}`;
+  
+      setupEventListenersPvz();
+  
+    } else if (selectedType.toLowerCase() === 'склад - дверь') {
+      additSender.innerHTML = `<label>Адрес</label>
+      <input type="text" id="sender_address" name="sender_address" placeholder="Введите адрес">
+      <label>Дом</label>
+      <input type="text" id="sender_house" name="sender_house" placeholder="Введите дом">
+      <label>Квартира</label>
+      <input type="text" id="sender_flat" name="sender_flat" placeholder="Введите квартиру">`;
+      senderAdress = `${document.getElementById('sender_address').value}, ${document.getElementById('sender_house').value}, ${document.getElementById('sender_flat').value} `;
+  
+      additRecepient.innerHTML = '';
+      
+    } else if (selectedType.toLowerCase() === 'склад - склад') {
+      additRecepient.innerHTML = '';
+  
+      additSender.innerHTML = `<label>Адрес пункта выдачи заказа</label>
+      <div class="destination_points_dropdown">
+  
+      <input type="text" id="sender_point" name="sender_point" placeholder="Введите адрес ПВЗ">
+      <ul id="sender_point-list" data-cities="{{ data }}"></ul>`;
+  
+      senderPoint = document.getElementById('sender_point');
+      senderPointList = document.getElementById('sender_point-list');
+      recepientAdress = `${senderPoint.value}`;
+  
+      setupEventListenersPvz();
+    }
   }
-
 }
 
 
-//////////////////
+
 
 let comboBox = document.getElementById('combobox_value_page5');
 
@@ -1963,71 +2004,87 @@ function addInputListenerPage5(amountInput, ndsInput, i, current) {
   });
 }
 
+let pastCount = 1;
 
 function showPlacesOnload() {
+  console.log("каунтер: " +placeCounter);
+  console.log("паст: " + pastCount);
+
   var keys = Object.keys(HashMap);
+
+  if (pastCount !== placeCounter) {
+    pastCount = placeCounter;
+      document.querySelector('.all_places_page5').innerHTML = '';
   
-  for (let i = 0; i < keys.length; i++) {
-    let current = HashMap[keys[i]];
-    const newPlace = document.createElement('div');
-    newPlace.id = `place${i+1}`;
-    newPlace.innerHTML = `
-          <div class="places-container_page5" id="places-container${i+1}">
-          <p class="place_title_page5"> Место ${i+1}</p>
-          <div class="places" id="place${i+1}_${current}">
-              <p class="items">Товар 1</p>
-              <label>Код артикула</label>
-              <input class="code" type="text" id="code${i+1}_${current}" placeholder="Введите артикул">
-              <label>Наименование товара</label>
-              <input class="page5_title" type="text" id="page5_title${i+1}_${current}"  value="ТНП" placeholder="Введите товар">
-              <label>Стоимость ед. товара в ₽</label>
-              <input type="number" id="place_cost${i+1}_${current}"  placeholder="Введите стоимость">
+
+    
+
+    for (let i = 0; i < keys.length; i++) {
+      let current = HashMap[keys[i]];
+      const newPlace = document.createElement('div');
+      newPlace.id = `place_${i+1}`;
+      newPlace.innerHTML = `
+            <div class="places-container_page5" id="places-container${i+1}">
+            <p class="place_title_page5"> Место ${i+1}</p>
+            <div class="places" id="place${i+1}_${current}">
+                <p class="items">Товар 1</p>
+                <label>Код артикула</label>
+                <input class="code" type="text" id="code${i+1}_${current}" placeholder="Введите артикул">
+                <label>Наименование товара</label>
+                <input class="page5_title" type="text" id="page5_title${i+1}_${current}"  value="ТНП" placeholder="Введите товар">
+                <label>Стоимость ед. товара в ₽</label>
+                <input type="number" id="place_cost${i+1}_${current}"  placeholder="Введите стоимость">
 
 
-              <div class="weight_input">
-                  <div class="left_input" id="left_input${i+1}_${current}">
-                      <label>Вес ед. товара (кг)</label>
-                      <input class="weight" type="number" id="weight${i+1}_${current}"  name="weight" placeholder="Введите кг.">
-                  </div>
-                  <div>
-                      <label>Кол-во ед.</label>
-                      <input class="count" type="number" id="count${i+1}_${current}" onkeypress="return event.charCode >= 48 && event.charCode <= 57" name="count" placeholder="Введите шт.">
-                  </div>  
-              </div>
+                <div class="weight_input">
+                    <div class="left_input" id="left_input${i+1}_${current}">
+                        <label>Вес ед. товара (кг)</label>
+                        <input class="weight" type="number" id="weight${i+1}_${current}"  name="weight" placeholder="Введите кг.">
+                    </div>
+                    <div>
+                        <label>Кол-во ед.</label>
+                        <input class="count" type="number" id="count${i+1}_${current}" onkeypress="return event.charCode >= 48 && event.charCode <= 57" name="count" placeholder="Введите шт.">
+                    </div>  
+                </div>
 
-              <label>Оплата получателя за ед. товара в т.ч. НДС ₽</label>
-              <input type="number" class="cost_page5" id="cost${i+1}_${current}" name="cost_with_nds" value="0" placeholder="Введите стоимость">
-              <div class="nds-flex">
-                  <div class="left_input_place" id="left_input_place${i+1}_${current}">
-                      <label>Ставка НДС, %</label>
-                      <input type="text" class="place_combobox_value" id="place_combobox_value${i+1}_${current}" onclick="showDropdownPage5('place_ndsList${i+1}_${current}')" placeholder="НДС" readonly>
-                      <ul id="place_ndsList${i+1}_${current}" class="dropdown-list">
-                          <li value="without" data-id="without" class="option" onclick="selectNDS('without', 'Нет НДС','place_combobox_value${i+1}_${current}', 'place_ndsList${i+1}_${current}','cost${i+1}_${current}','nds_cost${i+1}_${current}')">Нет НДС</li>
-                          <li value="zero" data-id="zero" class="option" onclick="selectNDS('zero', '0%','place_combobox_value${i+1}_${current}', 'place_ndsList${i+1}_${current}','cost${i+1}_${current}','nds_cost${i+1}_${current}')">0%</li>
-                          <li value="ten" data-id="ten" class="option" onclick="selectNDS('ten', '10%','place_combobox_value${i+1}_${current}', 'place_ndsList${i+1}_${current}','cost${i+1}_${current}','nds_cost${i+1}_${current}')">10%</li>
-                          <li value="twenty" data-id="twenty" class="option" onclick="selectNDS('twenty', '20%','place_combobox_value${i+1}_${current}', 'place_ndsList${i+1}_${current}','cost${i+1}_${current}','nds_cost${i+1}_${current}')">20%</li>
-                      </ul>
-                  </div>
+                <label>Оплата получателя за ед. товара в т.ч. НДС ₽</label>
+                <input type="number" class="cost_page5" id="cost${i+1}_${current}" name="cost_with_nds" value="0" placeholder="Введите стоимость">
+                <div class="nds-flex">
+                    <div class="left_input_place" id="left_input_place${i+1}_${current}">
+                        <label>Ставка НДС, %</label>
+                        <input type="text" class="place_combobox_value" id="place_combobox_value${i+1}_${current}" onclick="showDropdownPage5('place_ndsList${i+1}_${current}')" placeholder="НДС" readonly>
+                        <ul id="place_ndsList${i+1}_${current}" class="dropdown-list">
+                            <li value="without" data-id="without" class="option" onclick="selectNDS('without', 'Нет НДС','place_combobox_value${i+1}_${current}', 'place_ndsList${i+1}_${current}','cost${i+1}_${current}','nds_cost${i+1}_${current}')">Нет НДС</li>
+                            <li value="zero" data-id="zero" class="option" onclick="selectNDS('zero', '0%','place_combobox_value${i+1}_${current}', 'place_ndsList${i+1}_${current}','cost${i+1}_${current}','nds_cost${i+1}_${current}')">0%</li>
+                            <li value="ten" data-id="ten" class="option" onclick="selectNDS('ten', '10%','place_combobox_value${i+1}_${current}', 'place_ndsList${i+1}_${current}','cost${i+1}_${current}','nds_cost${i+1}_${current}')">10%</li>
+                            <li value="twenty" data-id="twenty" class="option" onclick="selectNDS('twenty', '20%','place_combobox_value${i+1}_${current}', 'place_ndsList${i+1}_${current}','cost${i+1}_${current}','nds_cost${i+1}_${current}')">20%</li>
+                        </ul>
+                    </div>
 
-                  <div>
-                      <label>Сумма НДС, ₽</label>
-                      <input type="text" class="nds_cost" id="nds_cost${i+1}_${current}" name="nds_cost" placeholder="Подсчет">
-                  </div>
-              </div>
-          </div>
-      </div>
-      <button class="created" type="button" id="add" onclick="addNumberPage5(${i+1})" >+ Добавить товар</button>`
-    document.querySelector('.all_places_page5').appendChild(newPlace);
-    var amountInput = document.getElementById(`cost${i+1}_${current}`);
-    var ndsInput = document.getElementById(`place_combobox_value${i+1}_${current}`);
+                    <div>
+                        <label>Сумма НДС, ₽</label>
+                        <input type="text" class="nds_cost" id="nds_cost${i+1}_${current}" name="nds_cost" placeholder="Подсчет">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="created" type="button" id="add" onclick="addNumberPage5(${i+1})" >+ Добавить товар</button>`
+      document.querySelector('.all_places_page5').appendChild(newPlace);
+      var amountInput = document.getElementById(`cost${i+1}_${current}`);
+      var ndsInput = document.getElementById(`place_combobox_value${i+1}_${current}`);
 
-    addInputListenerPage5(amountInput, ndsInput, i, current);
+      addInputListenerPage5(amountInput, ndsInput, i, current);
 
-      }
+        }
+
+    }
+    
 }
 
 
 function addNumberPage5(id) {
+  console.log(HashMap);
+
   let counter = HashMap[id]+1;
   const newPlace = document.createElement('div');
   newPlace.classList.add('places');
@@ -2114,6 +2171,8 @@ function addNumberPage5(id) {
 
 
 function removePlacePage5(placeId) {
+  console.log(HashMap);
+
   const placeToRemove = document.getElementById(placeId);
   if (!placeToRemove) return;
 
@@ -2177,7 +2236,6 @@ document.getElementById('amount').addEventListener('input', function() {
   }
 });
 
-
 function extractNumbers(role) {
   var numbersArray = [];
   var additArray = [];
@@ -2185,20 +2243,18 @@ function extractNumbers(role) {
   var container = document.getElementById(`${role}_numbers-container`);
 
   if (container) {
-      var recipientNumbers = container.querySelectorAll(`.${role}_numbers`);
+    var recipientNumbers = container.querySelectorAll(`.${role}_numbers`);
 
-      recipientNumbers.forEach(function(element) {
-          var mobileInput = element.querySelector(`.recipient_mobile`);
-          var additInput = element.querySelector(`.recipient_addit`);
+    recipientNumbers.forEach(function(element) {
+      var mobileInput = element.querySelector(`.${role}_mobile`);
+      var additInput = element.querySelector(`.${role}_addit`);
 
-          if (mobileInput && additInput) {
-              var mobileValue = mobileInput.value.trim();
-              numbersArray.push(mobileValue);
+      var mobileValue = mobileInput ? mobileInput.value.trim() : "";
+      var additValue = additInput ? additInput.value.trim() : "";
 
-              var additValue = additInput.value.trim();
-              additArray.push(additValue);
-          }
-      });
+      numbersArray.push(mobileValue);
+      additArray.push(additValue);
+    });
   }
 
   return [numbersArray, additArray];
@@ -2206,6 +2262,36 @@ function extractNumbers(role) {
 
 
 
+function gatherPlaces() {
+  var places = {};
+
+  var placeContainers = document.querySelectorAll('.places-container_page5');
+
+  placeContainers.forEach(function(placeContainer, index) {
+      var placeName = 'place_' + (index + 1);
+      places[placeName] = {};
+
+      var items = placeContainer.querySelectorAll('.places');
+
+      items.forEach(function(item, itemIndex) {
+          var itemName = 'item_' + (itemIndex + 1);
+          places[placeName][itemName] = {};
+
+          places[placeName][itemName]['code'] = item.querySelector('.code').value;
+          places[placeName][itemName]['name_item'] = item.querySelector('.page5_title').value;
+          places[placeName][itemName]['cost'] = item.querySelector('.cost_page5').value + ' ₽';
+          places[placeName][itemName]['weight'] = item.querySelector('.weight').value + ' кг.';
+          places[placeName][itemName]['count'] = item.querySelector('.count').value + ' шт.';
+          places[placeName][itemName]['amount'] = (item.querySelector('.cost_page5').value * item.querySelector('.count').value) + ' ₽';
+          places[placeName][itemName]['nds_count'] = item.querySelector('.nds_cost').value + ' ₽';
+          places[placeName][itemName]['nds_cost'] = (parseFloat(item.querySelector('.cost_page5').value) + parseFloat(item.querySelector('.nds_cost').value)) + ' ₽';
+      });
+  });
+
+  var jsonData = JSON.stringify({ "places": places });
+
+  return jsonData;
+}
 
 
 
@@ -2214,13 +2300,26 @@ let labels;
 let parametrsDiv = document.querySelector('.parametrs-details');
 let additionalDiv = document.querySelector('.additional');
 let totalCostElement = document.querySelector('.totalcost');
+let senderDiv = document.querySelector('.sender-details');
+let recepientDiv = document.querySelector('.recepient-details');
+let collectingDiv = document.querySelector('.collecting-details');
+
 let deliveryDateElement = document.querySelector('.delivery_date');
 
 
 function go_to_page6(){
-
+  var jsonData = gatherPlaces();
+  console.log(jsonData);
   var [numbersSender, additsSender] = extractNumbers('sender');
-  var [numbersRecepient, additsRecepient] = extractNumbers('recepient');
+  var [numbersRecepient, additsRecepient] = extractNumbers('recipient');
+
+
+  parametrsDiv.innerHTML = '';
+  additionalDiv.innerHTML = '';
+  senderDiv.innerHTML = '';
+  recepientDiv.innerHTML = '';
+  collectingDiv.innerHTML = '';
+
 
   let boxes_result = { "Коробка": { cost: [], desc: [] } };
   Object.values(globalResult.field7).forEach(box => {
@@ -2278,21 +2377,27 @@ function go_to_page6(){
     "sender": {
         "name" : `${document.getElementById('sender_company').value}`,
         "contact": `${document.getElementById('sender_fullname').value}`,
-        "number": numbersSender,
-        "address": additsSender
+        "number": {
+          "main": numbersSender,
+          "addit": additsSender
+      },
+        "address": senderAdress
     },
 
     "recepient": {
         "name" : `${document.getElementById('recipient_company').value}`,
         "contact": `${document.getElementById('recipient_fullname').value}`,
-        "number": numbersRecepient,
-        "address": additsRecepient
+        "number": {
+            "main": numbersRecepient,
+            "addit": additsRecepient
+        },
+        "address": recepientAdress
     },
 
     "collecting": {
-        "delivery_cost" : "100 ₽",
-        "nds_cost_common": "20 ₽",
-        "total_cost": "120 ₽",
+        "delivery_cost" : `${document.getElementById('amount').value}`,
+        "nds_cost_common": `${document.getElementById('combobox_value_page5').value}`,
+        "total_cost": `${document.getElementById('calculation').value}`,
         "places": {
             "place_1":
                         {
@@ -2331,8 +2436,8 @@ function go_to_page6(){
         }
     },
     "info": {
-        "Стоимость": "100.00 ₽",
-        "Срок доставки":"1-2 дня"
+        "Стоимость": `${selectedCost}`,
+        "Срок доставки":`${selectedTime}`
     }
 };
 
@@ -2357,8 +2462,12 @@ labels = {
   "total_cost":"Сумма за доп. сбор с получателя:"
 
 };
-  totalCostElement.textContent = `Стоимость: ${finalResult.info.Стоимость}`;
-  deliveryDateElement.textContent = `Срок доставки: ${finalResult.info['Срок доставки']}`;
+  if (selectedCost) {
+    totalCostElement.textContent = `Стоимость: ${finalResult.info.Стоимость}`;
+  }
+  if (selectedTime) {
+    deliveryDateElement.textContent = `Срок доставки: ${finalResult.info['Срок доставки']}`;
+  }
   for (let key in finalResult.parametrs) {
     let div = document.createElement('div');
     div.classList.add('rowitems');
@@ -2436,8 +2545,11 @@ for (let key in finalResult.additional) {
     additionalDiv.appendChild(div);
 }
   createKeyValueDiv();
-  push_to_page('sender-details', 'sender');
-  push_to_page('recepient-details', 'recepient');
+  console.log(numbersSender);
+  console.log(additsSender);
+
+  push_to_page()
+
 
   sliderShowPoint(6)
 }
@@ -2445,27 +2557,129 @@ for (let key in finalResult.additional) {
 
 
 
-function push_to_page(divname, get_from) {
-  let div_to_push = document.querySelector(`.${divname}`);
+function push_to_page() {
 
-  for (let key in finalResult[`${get_from}`]) {
-      let div = document.createElement('div');
-      div.classList.add('rowitems');
-  
-      let keyElement = document.createElement('p');
-      keyElement.classList.add('key');
-      keyElement.textContent = labels[key] || key;
-  
-      let valueElement = document.createElement('p');
-      valueElement.classList.add('value');
-      valueElement.textContent = finalResult[`${get_from}`][key];
-  
-      div.appendChild(keyElement);
-      div.appendChild(valueElement);
-  
-      div_to_push.appendChild(div);
+  for (let key in finalResult.sender) {
+    let div = document.createElement('div');
+    div.classList.add('numbers');
+
+    let keyElement = document.createElement('p');
+    keyElement.classList.add('key');
+    keyElement.textContent = `${key}:`;
+
+    let valueElement = document.createElement('div');
+    valueElement.classList.add('value');
+
+    if (typeof finalResult.sender[key] === 'object') {
+      if (Array.isArray(finalResult.sender[key].main)) {
+        for (let i = 0; i < finalResult.sender[key].main.length; i++) {
+          let itemDiv = document.createElement('div');
+          itemDiv.classList.add('sub');
+
+          let costElement = document.createElement('p');
+          costElement.textContent = finalResult.sender[key].main[i];
+          costElement.classList.add('main');
+
+          let descElement = document.createElement('p');
+          descElement.textContent = finalResult.sender[key].addit[i];
+          descElement.classList.add('addit');
+
+          itemDiv.appendChild(costElement);
+          itemDiv.appendChild(descElement);
+
+          valueElement.appendChild(itemDiv);
+        }
+      } else {
+        let divElse = document.createElement('div');
+        divElse.classList.add('sub');
+
+        let costElement = document.createElement('p');
+        costElement.textContent = finalResult.sender[key].main;
+        costElement.classList.add('main');
+        divElse.appendChild(costElement);
+
+        let descElement = document.createElement('p');
+        descElement.textContent = finalResult.sender[key].addit;
+        descElement.classList.add('addit');
+        divElse.appendChild(descElement);
+
+        valueElement.appendChild(divElse);
+      }
+    } else {
+      let element = document.createElement('p');
+      element.textContent = `${finalResult.sender[key]}`;
+      element.classList.add('non-object-value');
+      valueElement.appendChild(element);
+    }
+
+    div.appendChild(keyElement);
+    div.appendChild(valueElement);
+
+    senderDiv.appendChild(div);
+  }
+
+
+  for (let key in finalResult.recepient) {
+    let div = document.createElement('div');
+    div.classList.add('numbers');
+
+    let keyElement = document.createElement('p');
+    keyElement.classList.add('key');
+    keyElement.textContent = `${key}:`;
+
+    let valueElement = document.createElement('div');
+    valueElement.classList.add('value');
+
+    if (typeof finalResult.recepient[key] === 'object') {
+      if (Array.isArray(finalResult.recepient[key].main)) {
+        for (let i = 0; i < finalResult.recepient[key].main.length; i++) {
+          let itemDiv = document.createElement('div');
+          itemDiv.classList.add('sub');
+
+          let costElement = document.createElement('p');
+          costElement.textContent = finalResult.recepient[key].main[i];
+          costElement.classList.add('main');
+
+          let descElement = document.createElement('p');
+          descElement.textContent = finalResult.recepient[key].addit[i];
+          descElement.classList.add('addit');
+
+          itemDiv.appendChild(costElement);
+          itemDiv.appendChild(descElement);
+
+          valueElement.appendChild(itemDiv);
+        }
+      } else {
+        let divElse = document.createElement('div');
+        divElse.classList.add('sub');
+
+        let costElement = document.createElement('p');
+        costElement.textContent = finalResult.recepient[key].main;
+        costElement.classList.add('main');
+        divElse.appendChild(costElement);
+
+        let descElement = document.createElement('p');
+        descElement.textContent = finalResult.recepient[key].addit;
+        descElement.classList.add('addit');
+        divElse.appendChild(descElement);
+
+        valueElement.appendChild(divElse);
+      }
+    } else {
+      let element = document.createElement('p');
+      element.textContent = `${finalResult.recepient[key]}`;
+      element.classList.add('non-object-value');
+      valueElement.appendChild(element);
+    }
+
+    div.appendChild(keyElement);
+    div.appendChild(valueElement);
+
+    recepientDiv.appendChild(div);
   }
 }
+
+
 
 
 function createKeyValueDiv() {
