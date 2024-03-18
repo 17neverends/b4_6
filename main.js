@@ -2000,7 +2000,7 @@ function syncAddPlacePage5(i) {
             <label>Наименование товара</label>
             <input class="page5_title" type="text" id="page5_title${i+1}_${current}"  value="ТНП" placeholder="Введите товар">
             <label>Стоимость ед. товара в ₽</label>
-            <input type="number" id="place_cost${i+1}_${current}"  placeholder="Введите стоимость">
+            <input type="number" id="place_cost${i+1}_${current}" class="place_cost" placeholder="Введите стоимость">
 
 
             <div class="weight_input">
@@ -2112,7 +2112,7 @@ function addNumberPage5(id) {
       <label>Наименование товара</label>
       <input class="page5_title" type="text" id="page5_title${id}_${counter}" value="ТНП" placeholder="Введите товар">
       <label>Стоимость ед. товара в ₽</label>
-      <input type="number" id="place_cost${id}_${counter}" name="place_cost" placeholder="Введите стоимость">
+      <input type="number" id="place_cost${id}_${counter}" class="place_cost" placeholder="Введите стоимость">
 
       <div class="weight_input">
           <div class="left_input" id="left_input${id}_${counter}">
@@ -2284,12 +2284,12 @@ function gatherPlaces() {
 
           places[placeName][itemName]['code'] = item.querySelector('.code').value;
           places[placeName][itemName]['name_item'] = item.querySelector('.page5_title').value;
-          places[placeName][itemName]['cost'] = item.querySelector('.cost_page5').value + ' ₽';
+          places[placeName][itemName]['cost'] = item.querySelector('.place_cost').value + ' ₽';
           places[placeName][itemName]['weight'] = item.querySelector('.weight').value.trim() !== '' ? item.querySelector('.weight').value + ' кг.' : '';
           places[placeName][itemName]['count'] = item.querySelector('.count').value.trim() !== '' ? item.querySelector('.count').value + ' шт.' : '';          
-          places[placeName][itemName]['amount'] = (item.querySelector('.cost_page5').value * item.querySelector('.count').value) + ' ₽';
-          places[placeName][itemName]['nds_count'] = item.querySelector('.nds_cost').value + ' ₽';
-          places[placeName][itemName]['nds_cost'] = (parseFloat(item.querySelector('.cost_page5').value) + parseFloat(item.querySelector('.nds_cost').value)) + ' ₽';
+          places[placeName][itemName]['amount'] = item.querySelector('.cost_page5').value + ' ₽';
+          places[placeName][itemName]['nds_count'] = item.querySelector('.place_combobox_value').value;
+          places[placeName][itemName]['nds_cost'] = (item.querySelector('.nds_cost').value) + ' ₽';
       });
   });
 
