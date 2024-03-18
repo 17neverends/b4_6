@@ -330,7 +330,6 @@ function check_inputs_step1() {
     } 
   }
   
-  console.log(placesData);
   if (isValid) {
     // if (departure_from_list == true && destination_from_list == true && placesData.length > 0){
     //   toTarif = true;
@@ -1848,7 +1847,48 @@ function submit_info() {
 }
 
 let comboBox = document.getElementById('combobox_value_page5');
+var amountInput = document.getElementById("amount");
+var ndsInput = document.getElementById("combobox_value_page5");
 
+amountInput.addEventListener("input", function() {
+  if (amountInput.value !== '' && ndsInput.value !== '') {
+    calculateTotalAmount();
+  } else {
+    document.getElementById("calculation").value = '';
+  }
+});
+
+ndsInput.addEventListener("change", function() {
+  if (amountInput.value !== '' && ndsInput.value !== '') {
+    calculateTotalAmount();
+  } else {
+    document.getElementById("calculation").value = '';
+  }
+});
+
+function calculateTotalAmount() {
+  var amount = parseFloat(document.getElementById("amount").value);
+  var ndsRateText = document.getElementById("combobox_value_page5").value;
+  var calculationInput = document.getElementById("calculation");
+  var ndsRate;
+  if (ndsRateText === '10%' || ndsRateText === '20%') {
+    ndsRate = parseInt(ndsRateText);
+  } else {
+    ndsRate = 0;
+  }
+
+  var prod;
+  if (ndsRate === 10) {
+    prod = 9.090909;
+  } else if (ndsRate === 20) {
+    prod = 16.666667;
+  } else {
+    prod = 0;
+  }
+
+  var total = amount * prod / 100;
+  calculationInput.value = total.toFixed(2);
+}
 
 
 function showDropdownPage5(inputID) {
@@ -1874,17 +1914,17 @@ function selectNDS(value, text, inputId, listId, getID, whereID) {
   } else {
       var amount = parseFloat(document.getElementById(`${getID}`).value);
       var ndsRate = parseFloat(text);
-      calculateTotalPage5(amount, ndsRate, whereID);
+      calculateTotalPage5Page5(amount, ndsRate, whereID);
   }
   list.style.display = 'none';
 }
 
-function calculateTotalPage5(amount, ndsRate, whereID) {
+
+
+
+function calculateTotalPage5Page5(amount, ndsRate, whereID) {
   var total;
-  
-  if (!amount || isNaN(amount)) {
-    total = ''; 
-  } else if (ndsRate === 0 || ndsRate === 'Нет НДС' || ndsRate === 'zero') {
+   if (ndsRate === 0 || ndsRate === 'Нет НДС' || ndsRate === 'zero') {
     total = 0;
   } else {
     var prod;
@@ -1895,6 +1935,7 @@ function calculateTotalPage5(amount, ndsRate, whereID) {
     }
     
     total = amount * prod / 100;
+
   }
 
   document.getElementById(whereID).value = total === '' ? '' : total.toFixed(2);
@@ -1913,47 +1954,7 @@ document.getElementById('amount').addEventListener('input', function() {
   }
 });
 
-var amountInput = document.getElementById("amount");
 
-amountInput.addEventListener("input", function() {
-    if (amountInput.value !== '' && comboBox.value !== '') {
-      calculateTotal();
-    } else {
-      document.getElementById("calculation").value = '';
-    }
-});
-  
-comboBox.addEventListener("change", function() {
-  if (amountInput.value !== '' && comboBox.value !== '') {
-    calculateTotal();
-  } else {
-    document.getElementById("calculation").value = '';
-  }
-});
-
-function calculateTotal() {
-  var amount = parseFloat(document.getElementById("amount").value);
-  var ndsRateText = comboBox.value;
-  var calculationInput = document.getElementById("calculation");
-  var ndsRate;
-  if (ndsRateText === '10%' || ndsRateText === '20%') {
-    ndsRate = parseInt(ndsRateText);
-  } else {
-    ndsRate = 0;
-  }
-
-  var prod;
-  if (ndsRate === 10) {
-    prod = 9.090909;
-  } else if (ndsRate === 20) {
-    prod = 16.666667;
-  } else {
-    prod = 0;
-  }
-
-  var total = amount * prod / 100;
-  calculationInput.value = total.toFixed(2);
-}
 
 
 
@@ -1978,7 +1979,7 @@ function addInputListenerPage5(amountInput, ndsInput, i, current) {
                   ndsRate = 0;
           }
 
-          calculateTotalPage5(amount, ndsRate, `nds_cost${i+1}_${current}`);
+          calculateTotalPage5Page5(amount, ndsRate, `nds_cost${i+1}_${current}`);
       } 
   });
 }
@@ -1986,7 +1987,6 @@ function addInputListenerPage5(amountInput, ndsInput, i, current) {
 
 function syncAddPlacePage5(i) {
   var keys = Object.keys(HashMap);
-  console.log(keys);
   let current = HashMap[keys[i]];
   let pushIn = document.querySelector('.all_places_page5');
 
@@ -2040,15 +2040,62 @@ function syncAddPlacePage5(i) {
   var ndsInput = document.getElementById(`place_combobox_value${i+1}_${current}`);
 
   addInputListenerPage5(amountInput, ndsInput, i, current);
-
+  document.getElementById(`cost1_111`).addEventListener('input', function() {
+    var amount = parseFloat(document.getElementById('cost1_111').value);
+    var ndsRateText = document.getElementById(`place_combobox_value1_1`).value;
+    var ndsRate;
+    if (ndsRateText.trim() !== '') {
+        switch (ndsRateText) {
+            case 'Нет НДС':
+            case 'zero':
+                ndsRate = 0;
+                break;
+            case '10%':
+                ndsRate = 10;
+                break;
+            case '20%':
+                ndsRate = 20;
+                break;
+            default:
+                ndsRate = 0;
+        }
+  
+        calculateTotalPage5Page5(amount, ndsRate, `nds_cost1_1`);
+    } 
+  });
 }
+
+
+
+document.getElementById(`cost1_111`).addEventListener('input', function() {
+  var amount = parseFloat(document.getElementById('cost1_111').value);
+  var ndsRateText = document.getElementById(`place_combobox_value1_1`).value;
+  var ndsRate;
+  if (ndsRateText.trim() !== '') {
+      switch (ndsRateText) {
+          case 'Нет НДС':
+          case 'zero':
+              ndsRate = 0;
+              break;
+          case '10%':
+              ndsRate = 10;
+              break;
+          case '20%':
+              ndsRate = 20;
+              break;
+          default:
+              ndsRate = 0;
+      }
+
+      calculateTotalPage5Page5(amount, ndsRate, `nds_cost1_1`);
+  } 
+});
+
 
 
 function syncDeletePlacePage5(i) {
   document.getElementById(`places-container${i}`).remove();
-
   document.getElementById(`add${i}`).remove();
-
 }
 
 function addNumberPage5(id) {
@@ -2102,11 +2149,13 @@ function addNumberPage5(id) {
   document.getElementById(`places-container${id}`).appendChild(newPlace);
   var amountInput = document.getElementById(`cost${id}_${counter}`);
   var ndsInput = document.getElementById(`place_combobox_value${id}_${counter}`);
-  
+
+
   amountInput.addEventListener('input', function() {
     var amount = parseFloat(amountInput.value);
     var ndsRateText = ndsInput.value.trim();
-    
+    console.log(amount);
+    console.log(ndsRateText);
     if (amount && ndsRateText !== '') {
         var ndsRate;
         
@@ -2124,7 +2173,7 @@ function addNumberPage5(id) {
                 ndsRate = 0;
         }
 
-        calculateTotal(amount, ndsRate, `nds_cost${id}_${counter}`);
+        calculateTotalPage5Page5(amount, ndsRate, `nds_cost${id}_${counter}`);
     } else {
         document.getElementById(`nds_cost${id}_${counter}`).value = '';
     }
@@ -2192,17 +2241,6 @@ function removePlacePage5(placeId) {
 
 
 
-document.getElementById('amount').addEventListener('input', function() {
-  var amount = parseFloat(this.value);
-  var hiddenDiv = document.querySelector('.hidden_div');
-  if (!isNaN(amount) && amount > 0) {
-      hiddenDiv.style.display = 'block';
-  } else {
-      hiddenDiv.style.display = 'none';
-      document.getElementById('combobox_value_page5').value = '';
-      document.getElementById('calculation').value = '';
-  }
-});
 
 function extractNumbers(role) {
   var numbersArray = [];
@@ -2229,7 +2267,6 @@ function extractNumbers(role) {
 }
 
 
-// исправить для вставки в json
 function gatherPlaces() {
   var places = {};
 
@@ -2248,18 +2285,17 @@ function gatherPlaces() {
           places[placeName][itemName]['code'] = item.querySelector('.code').value;
           places[placeName][itemName]['name_item'] = item.querySelector('.page5_title').value;
           places[placeName][itemName]['cost'] = item.querySelector('.cost_page5').value + ' ₽';
-          places[placeName][itemName]['weight'] = item.querySelector('.weight').value + ' кг.';
-          places[placeName][itemName]['count'] = item.querySelector('.count').value + ' шт.';
+          places[placeName][itemName]['weight'] = item.querySelector('.weight').value.trim() !== '' ? item.querySelector('.weight').value + ' кг.' : '';
+          places[placeName][itemName]['count'] = item.querySelector('.count').value.trim() !== '' ? item.querySelector('.count').value + ' шт.' : '';          
           places[placeName][itemName]['amount'] = (item.querySelector('.cost_page5').value * item.querySelector('.count').value) + ' ₽';
           places[placeName][itemName]['nds_count'] = item.querySelector('.nds_cost').value + ' ₽';
           places[placeName][itemName]['nds_cost'] = (parseFloat(item.querySelector('.cost_page5').value) + parseFloat(item.querySelector('.nds_cost').value)) + ' ₽';
       });
   });
 
-  var jsonData = JSON.stringify({ "places": places });
-
-  return jsonData;
+  return places;
 }
+
 
 
 
@@ -2276,8 +2312,6 @@ let deliveryDateElement = document.querySelector('.delivery_date');
 
 
 function go_to_page6(){
-  var jsonData = gatherPlaces();
-  console.log(jsonData);
   var [numbersSender, additsSender] = extractNumbers('sender');
   var [numbersRecepient, additsRecepient] = extractNumbers('recipient');
 
@@ -2366,48 +2400,14 @@ function go_to_page6(){
         "delivery_cost" : `${document.getElementById('amount').value}`,
         "nds_cost_common": `${document.getElementById('combobox_value_page5').value}`,
         "total_cost": `${document.getElementById('calculation').value}`,
-        "places": {
-            "place_1":
-                        {
-                            "item_1": {
-                                "code": "12121",
-                                "name_item": "Место 1 Товар 1",
-                                "cost": "10000 ₽",
-                                "weight": "10 кг.",
-                                "count": "3 шт.",
-                                "amount": "30000 ₽",
-                                "nds_count": "200 ₽",
-                                "nds_cost": "30200 ₽"
-                            },
-                            "item_2": {
-                                "code": "12121",
-                                "name_item": "Место 1 Товар 1",
-                                "cost": "10000 ₽",
-                                "weight": "10 кг.",
-                                "count": "3 шт.",
-                                "amount": "30000 ₽",
-                                "nds_count": "200 ₽",
-                                "nds_cost": "30200 ₽"
-                            },
-                            "item_3": {
-                                "code": "12121",
-                                "name_item": "Место 1 Товар 1",
-                                "cost": "10000 ₽",
-                                "weight": "10 кг.",
-                                "count": "3 шт.",
-                                "amount": "30000 ₽",
-                                "nds_count": "200 ₽",
-                                "nds_cost": "30200 ₽"
-                            }
-                        },
-            
-        }
-    },
+          },
     "info": {
         "Стоимость": `${selectedCost}`,
         "Срок доставки":`${selectedTime}`
     }
 };
+finalResult.collecting.places = gatherPlaces();
+
 
 labels = {
   "name": "ФИО/Компания:",
@@ -2513,8 +2513,7 @@ for (let key in finalResult.additional) {
     additionalDiv.appendChild(div);
 }
   createKeyValueDiv();
-  console.log(numbersSender);
-  console.log(additsSender);
+
 
   push_to_page()
 
