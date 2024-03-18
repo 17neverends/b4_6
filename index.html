@@ -321,6 +321,52 @@
         </div>
         <div class="all_places_page5">
 
+            <div class="places-container_page5" id="places-container1">
+                <p class="place_title_page5"> Место 1</p>
+                <div class="places" id="place1_1">
+                    <p class="items">Товар 1</p>
+                    <label>Код артикула</label>
+                    <input class="code" type="text" id="code1_1" placeholder="Введите артикул">
+                    <label>Наименование товара</label>
+                    <input class="page5_title" type="text" id="page5_title1_1"  value="ТНП" placeholder="Введите товар">
+                    <label>Стоимость ед. товара в ₽</label>
+                    <input type="number" id="place_cost1_1"  placeholder="Введите стоимость">
+    
+    
+                    <div class="weight_input">
+                        <div class="left_input" id="left_input1_1">
+                            <label>Вес ед. товара (кг)</label>
+                            <input class="weight" type="number" id="weight1_1" placeholder="Введите кг.">
+                        </div>
+                        <div>
+                            <label>Кол-во ед.</label>
+                            <input class="count" type="number" id="count1_1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" placeholder="Введите шт.">
+                        </div>  
+                    </div>
+    
+                    <label>Оплата получателя за ед. товара в т.ч. НДС ₽</label>
+                    <input type="number" class="cost_page5" id="cost1_1" name="cost_with_nds" value="0" placeholder="Введите стоимость">
+                    <div class="nds-flex">
+                        <div class="left_input_place" id="left_input_place1_1">
+                            <label>Ставка НДС, %</label>
+                            <input type="text" class="place_combobox_value" id="place_combobox_value1_1" onclick="showDropdownPage5('place_ndsList1_1')" placeholder="НДС" readonly>
+                            <ul id="place_ndsList1_1" class="dropdown-list">
+                                <li value="without" data-id="without" class="option" onclick="selectNDS('without', 'Нет НДС','place_combobox_value1_1', 'place_ndsList1_1','cost1_1','nds_cost1_1')">Нет НДС</li>
+                                <li value="zero" data-id="zero" class="option" onclick="selectNDS('zero', '0%','place_combobox_value1_1', 'place_ndsList1_1','cost1_1','nds_cost1_1')">0%</li>
+                                <li value="ten" data-id="ten" class="option" onclick="selectNDS('ten', '10%','place_combobox_value1_1', 'place_ndsList1_1','cost1_1','nds_cost1_1')">10%</li>
+                                <li value="twenty" data-id="twenty" class="option" onclick="selectNDS('twenty', '20%','place_combobox_value1_1', 'place_ndsList1_1','cost1_1','nds_cost1_1')">20%</li>
+                            </ul>
+                        </div>
+    
+                        <div>
+                            <label>Сумма НДС, ₽</label>
+                            <input type="text" class="nds_cost" id="nds_cost${i+1}_${current}" name="nds_cost" placeholder="Подсчет">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="created" type="button" id="add1" onclick="addNumberPage5(1)" >+ Добавить товар</button>
+
         </div>
 
             <label class="status" id="status5"></label>

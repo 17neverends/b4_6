@@ -317,8 +317,6 @@ ul {
     cursor: pointer;
     height: 7vh;
     width: 100%;
-    margin-bottom: -40px;
-    margin-top: 5px;
     border-radius: 10px;
     font-size: 17px;
     text-align: center;
@@ -328,6 +326,8 @@ ul {
     justify-content: center;
     line-height: 30px;
     transition: 0.5s; 
+    margin-bottom: 50px;
+    margin-top: 20px;
 
 }
 
@@ -671,10 +671,7 @@ ul {
 
 
 
-#add {
-    margin-bottom: 50px;
-    margin-top: 20px;
-}
+
 
 .recipient_numbers, .sender_numbers {
     border:1px solid #4bba5d;
