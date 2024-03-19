@@ -100,7 +100,7 @@ let needCheckPvz = false;
 let pastCount = 1;
 
 
-
+//Договор
 window.onload = function() {
   init();
   contracts = {
@@ -319,7 +319,7 @@ function check_inputs_step1() {
       }
     } 
   }
-  
+  //Анкомит с проверкой флагов, а нижний if убери
   if (isValid) {
     // if (departure_from_list == true && destination_from_list == true && placesData.length > 0){
     //   toTarif = true;
@@ -357,6 +357,8 @@ function check_inputs_step1() {
       method: 'POST',
       body: formData
   }).then(() => {
+
+    //Тарифы
     let responseData = {
       "details": [
           { "type": "Дверь - дверь", "cost": "100₽", "datetime": "1-3 раб.д" },
@@ -376,6 +378,7 @@ function check_inputs_step1() {
 
   })
   } else{ 
+    //Коробки
     selectedType = 'Не выбран';
     boxData = {
       "Коробка XS": {
@@ -860,7 +863,9 @@ document.getElementById("confirm2").addEventListener("click", function () {
     senderAdress = '';
     recepientAdress = '';
   } 
+  
       document.getElementById('totalcost').style.display = 'block';
+      //Коробки
       boxData = {
         "Коробка XS": {
         "ширина": 17,
@@ -1500,7 +1505,7 @@ function check_inputs_page4() {
   let senderPoint = document.getElementById('sender_point');
   if (senderPoint && senderPoint.value !== ""){
     removeErrorStyle(senderPoint);
-
+    // Анкомит 
     // if (!pvz_from_list) {
 
     //   isValid = false;
@@ -2321,6 +2326,7 @@ function extractNumbers(role) {
 }
 
 
+
 function gatherPlaces() {
   var places = {};
 
@@ -2329,6 +2335,7 @@ function gatherPlaces() {
   placeContainers.forEach(function(placeContainer, index) {
       var placeName = 'place_' + (index + 1);
       places[placeName] = {};
+      var totalCount = 0; 
 
       var items = placeContainer.querySelectorAll('.places');
 
@@ -2344,12 +2351,20 @@ function gatherPlaces() {
           places[placeName][itemName]['amount'] = item.querySelector('.cost_page5').value + '₽';
           places[placeName][itemName]['nds_count'] = item.querySelector('.place_combobox_value').value;
           places[placeName][itemName]['nds_cost'] = item.querySelector('.nds_cost').value.trim() !== '' ? item.querySelector('.nds_cost').value + '₽' : '';
+
+          var countValue = parseInt(item.querySelector('.count').value.trim());
+          totalCount += isNaN(countValue) ? 0 : countValue;
       });
+      console.log(totalCount);
+      if (totalCount > 1000) {
+          places = {};
+          document.getElementById('status5').innerText = `Количество товаров в месте ${index+1} превышает 999.000`;
+          return;
+      }
   });
 
   return places;
 }
-
 
 
 
@@ -2366,8 +2381,10 @@ let deliveryDateElement = document.querySelector('.delivery_date');
 
 
 function go_to_page6(){
-
-  
+  let placeInfo = gatherPlaces();
+  if (Object.keys(placeInfo).length === 0){
+    return;
+  }
   var [numbersSender, additsSender] = extractNumbers('sender');
   var [numbersRecepient, additsRecepient] = extractNumbers('recipient');
 
@@ -2462,7 +2479,7 @@ function go_to_page6(){
         "Срок доставки":`${selectedTime}`
     }
 };
-finalResult.collecting.places = gatherPlaces();
+finalResult.collecting.places = placeInfo;
 
 
 labels = {
