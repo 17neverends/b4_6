@@ -2407,7 +2407,7 @@ function go_to_page6(){
     "parametrs": {
         "Размер посылки": data.packages[0].length && data.packages[0].width && data.packages[0].height ? `${data.packages[0].length}x${data.packages[0].width}x${data.packages[0].height} см` : '',
         "Физический вес посылки": data.packages[0].weight ? data.packages[0].weight : '',
-        "Расчётный вес посылки": "20кг",
+        "Расчётный вес посылки": data.packages[0].length && data.packages[0].width && data.packages[0].height ? `${(data.packages[0].length * data.packages[0].width * data.packages[0].height) / 5000} кг` : '',
         "Город отправителя": `${document.getElementById('departure_city').value}`,
         "Город получателя": `${document.getElementById('destination_city').value}`,
         "Тип доставки": `${selectedType}`
