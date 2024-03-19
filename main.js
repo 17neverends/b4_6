@@ -31,16 +31,6 @@ class Result {
   this.field6 = field6;
   this.field7 = field7;
   }
-
-  logInfo() {
-      console.log('Field 1:', this.field1);
-      console.log('Field 2:', this.field2);
-      console.log('Field 3:', this.field3);
-      console.log('Field 4:', this.field4); 
-      console.log('Field 5:', this.field5);
-      console.log('Field 6:', this.field6);
-      console.log('Field 7:', this.field7);
-  }
 }
 
 
@@ -477,7 +467,6 @@ function gatherFormData() {
       };
 
       formData.places.push(placeData);
-      console.log(i);
 
       i++;
   }
@@ -728,11 +717,16 @@ document.getElementById("sortSelect").addEventListener("change", function (event
 
 function sliderShowPoint(point){
   var buttons = document.querySelectorAll('.slider_button');
+  document.getElementById('status1').innerText = '';
+  document.getElementById('status2').innerText = '';
+  document.getElementById('status4').innerText = '';
+  document.getElementById('status5').innerText = '';
+
   buttons.forEach(function(btn){
     btn.classList.remove('active');
   });
   document.getElementById('slider' + point).classList.add('active');
-  
+  scrollToTop()
   if (point === 1)
   {
     page1.style.display = 'block';
@@ -1503,16 +1497,16 @@ function check_inputs_page4() {
 
   processInputs(recipientNumbers, 'recipient', isValidMobileNumber);
   processInputs(senderNumbers, 'sender', isValidMobileNumber);
-  const senderPoint = document.getElementById('sender_point');
+  let senderPoint = document.getElementById('sender_point');
   if (senderPoint && senderPoint.value !== ""){
     removeErrorStyle(senderPoint);
 
-    if (!pvz_from_list) {
+    // if (!pvz_from_list) {
 
-      isValid = false;
+    //   isValid = false;
 
-      applyErrorStyle(senderPoint);
-    }
+    //   applyErrorStyle(senderPoint);
+    // }
   }
 
 
@@ -1521,39 +1515,98 @@ function check_inputs_page4() {
 
 
   if (isValid) {
-    // for (let i = 1; i < placeCounter;i++){
-    //   HashMap[i] = 1;
-    // }
+
+    senderAdress = '';
+    recepientAdress = '';
+    const senderAddressInput = document.getElementById('sender_address');
+    const senderHouseInput = document.getElementById('sender_house');
+    const senderFlatInput = document.getElementById('sender_flat');
+    
+    const recipientAddressInput = document.getElementById('recipient_address');
+    const recipientHouseInput = document.getElementById('recipient_house');
+    const recipientFlatInput = document.getElementById('recipient_flat');
+
 
     if (selectedType.toLowerCase() === 'дверь - дверь') {
 
-      senderAdress = `${document.getElementById('sender_address').value}, ${document.getElementById('sender_house').value}, ${document.getElementById('sender_flat').value} `;
+      let previousFieldFilled = false;
 
+      if (senderAddressInput.value.trim() !== '') {
+          senderAdress += senderAddressInput.value.trim();
+          previousFieldFilled = true;
+      }
+
+      if (senderHouseInput.value.trim() !== '') {
+          senderAdress += previousFieldFilled ? `, ${senderHouseInput.value.trim()}` : senderHouseInput.value.trim();
+          previousFieldFilled = true;
+      }
+
+      if (senderFlatInput.value.trim() !== '') {
+          senderAdress += previousFieldFilled ? `, ${senderFlatInput.value.trim()}` : senderFlatInput.value.trim();
+      }
+
+      previousFieldFilled = false;
+
+      if (recipientAddressInput.value.trim() !== '') {
+          recepientAdress += recipientAddressInput.value.trim();
+          previousFieldFilled = true;
+      }
+
+      if (recipientHouseInput.value.trim() !== '') {
+          recepientAdress += previousFieldFilled ? `, ${recipientHouseInput.value.trim()}` : recipientHouseInput.value.trim();
+          previousFieldFilled = true;
+      }
+
+      if (recipientFlatInput.value.trim() !== '') {
+          recepientAdress += previousFieldFilled ? `, ${recipientFlatInput.value.trim()}` : recipientFlatInput.value.trim();
+      }
+  } else if (selectedType.toLowerCase() === 'дверь - склад') {
+
+      let previousField = false;
+
+      if (recipientAddressInput.value.trim() !== '') {
+          recepientAdress += recipientAddressInput.value.trim();
+          previousField = true;
+      }
+
+      if (recipientHouseInput.value.trim() !== '') {
+          recepientAdress += previousField ? `, ${recipientHouseInput.value.trim()}` : recipientHouseInput.value.trim();
+          previousField = true;
+      }
+
+      if (recipientFlatInput.value.trim() !== '') {
+          recepientAdress += previousField ? `, ${recipientFlatInput.value.trim()}` : recipientFlatInput.value.trim();
+      }
       recepientAdress = `${document.getElementById('recipient_address').value}, ${document.getElementById('recipient_house').value}, ${document.getElementById('recipient_flat').value} `;
-  
-    } else if (selectedType.toLowerCase() === 'дверь - склад') {
-
-      recepientAdress = `${document.getElementById('recipient_address').value}, ${document.getElementById('recipient_house').value}, ${document.getElementById('recipient_flat').value} `;
 
   
-      senderPoint = document.getElementById('sender_point');
       senderAdress = `${senderPoint.value}`;
 
   
     } else if (selectedType.toLowerCase() === 'склад - дверь') {
 
-      senderAdress = `${document.getElementById('sender_address').value}, ${document.getElementById('sender_house').value}, ${document.getElementById('sender_flat').value} `;
+      let previousFieldAlready = false;
+      if (senderAddressInput.value.trim() !== '') {
+        senderAdress += senderAddressInput.value.trim();
+        previousFieldAlready = true;
+        }
 
+        if (senderHouseInput.value.trim() !== '') {
+            senderAdress += previousFieldAlready ? `, ${senderHouseInput.value.trim()}` : senderHouseInput.value.trim();
+            previousFieldAlready = true;
+        }
+
+        if (senderFlatInput.value.trim() !== '') {
+            senderAdress += previousFieldAlready ? `, ${senderFlatInput.value.trim()}` : senderFlatInput.value.trim();
+        }
       
     } else if (selectedType.toLowerCase() === 'склад - склад') {
       
   
-      senderPoint = document.getElementById('sender_point');
       recepientAdress = `${senderPoint.value}`;
   
     }
     sliderShowPoint(5);
-    // showPlacesOnload();
   } else {
     status4.innerText = 'Заполните все поля корректно';
   }
@@ -2101,6 +2154,10 @@ function syncDeletePlacePage5(i) {
 function addNumberPage5(id) {
 
   let counter = HashMap[id]+1;
+  if (counter > 126){
+    document.getElementById('status5').innerText = 'Максимум 126 уникальных товаров'
+    return;
+  }
   const newPlace = document.createElement('div');
   newPlace.classList.add('places');
   newPlace.id = `place${id}_${counter}`;
@@ -2154,8 +2211,6 @@ function addNumberPage5(id) {
   amountInput.addEventListener('input', function() {
     var amount = parseFloat(amountInput.value);
     var ndsRateText = ndsInput.value.trim();
-    console.log(amount);
-    console.log(ndsRateText);
     if (amount && ndsRateText !== '') {
         var ndsRate;
         
@@ -2188,7 +2243,6 @@ function addNumberPage5(id) {
 
 
 function removePlacePage5(placeId) {
-  console.log(HashMap);
 
   const placeToRemove = document.getElementById(placeId);
   if (!placeToRemove) return;
@@ -2284,12 +2338,12 @@ function gatherPlaces() {
 
           places[placeName][itemName]['code'] = item.querySelector('.code').value;
           places[placeName][itemName]['name_item'] = item.querySelector('.page5_title').value;
-          places[placeName][itemName]['cost'] = item.querySelector('.place_cost').value + ' ₽';
+          places[placeName][itemName]['cost'] = item.querySelector('.place_cost').value.trim() !== '' ? item.querySelector('.place_cost').value + '₽' : '';
           places[placeName][itemName]['weight'] = item.querySelector('.weight').value.trim() !== '' ? item.querySelector('.weight').value + ' кг.' : '';
           places[placeName][itemName]['count'] = item.querySelector('.count').value.trim() !== '' ? item.querySelector('.count').value + ' шт.' : '';          
-          places[placeName][itemName]['amount'] = item.querySelector('.cost_page5').value + ' ₽';
+          places[placeName][itemName]['amount'] = item.querySelector('.cost_page5').value + '₽';
           places[placeName][itemName]['nds_count'] = item.querySelector('.place_combobox_value').value;
-          places[placeName][itemName]['nds_cost'] = (item.querySelector('.nds_cost').value) + ' ₽';
+          places[placeName][itemName]['nds_cost'] = item.querySelector('.nds_cost').value.trim() !== '' ? item.querySelector('.nds_cost').value + '₽' : '';
       });
   });
 
@@ -2312,6 +2366,8 @@ let deliveryDateElement = document.querySelector('.delivery_date');
 
 
 function go_to_page6(){
+
+  
   var [numbersSender, additsSender] = extractNumbers('sender');
   var [numbersRecepient, additsRecepient] = extractNumbers('recipient');
 
@@ -2326,7 +2382,7 @@ function go_to_page6(){
   let boxes_result = { "Коробка": { cost: [], desc: [] } };
   Object.values(globalResult.field7).forEach(box => {
     boxes_result["Коробка"].cost.push(box.стоимость + "₽");
-    boxes_result["Коробка"].desc.push(`Вес до ${box.вес}кг (${box.размер}) ${box.кол_во}шт`);
+    boxes_result["Коробка"].desc.push(`Вес до ${box.вес} кг (${box.размер}) ${box.кол_во}шт`);
   });
 
 
@@ -2342,22 +2398,22 @@ function go_to_page6(){
     "additional": {
         "Примерка на дому": {
             "cost": result.field1 ? '0₽' : '',
-            "desc": result.field1 ? 'да' : ''
+            "desc": result.field1 ? '' : ''
         },
 
           "Уведомление о создании заказа в СДЭК": {
             "cost": result.field2 ? "10₽" : '',
-            "desc": result.field2 ? 'да' : ''
+            "desc": result.field2 ? '' : ''
         },
 
           "Скан документов": {
             "cost": result.field3 ? "50₽" : '',
-            "desc": result.field3 ? 'да' : ''
+            "desc": result.field3 ? '' : ''
         },
 
           "Частичная доставка": {
             "cost": result.field4 ? "0₽" : '',
-            "desc": result.field4 ? 'да' : ''
+            "desc": result.field4 ? '' : ''
         },
         "Воздушно-пузырчатая плёнка": {
             "cost": result.field5 ? result.field5[0] : '',
@@ -2368,7 +2424,7 @@ function go_to_page6(){
           "desc": result.field6 ? result.field6[1] : ''
         },
         "Погрузка-разгрузочные работы":{
-            "cost": star ? prr : '',
+            "cost": star ? prr + "₽" : '',
             "desc": ''
         },
         "Коробка": {
@@ -2432,9 +2488,15 @@ labels = {
 };
   if (selectedCost) {
     totalCostElement.textContent = `Стоимость: ${finalResult.info.Стоимость}`;
+  } else {
+    totalCostElement.textContent = '';
+
   }
   if (selectedTime) {
     deliveryDateElement.textContent = `Срок доставки: ${finalResult.info['Срок доставки']}`;
+  } else {
+    deliveryDateElement.textContent = '';
+
   }
   for (let key in finalResult.parametrs) {
     let div = document.createElement('div');

@@ -343,6 +343,9 @@ ul {
 
 }
 
+#resultBack {
+    margin-bottom: 0;
+}
 
 #scrollToTopBtn {
     position:fixed;
